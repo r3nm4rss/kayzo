@@ -2,7 +2,7 @@
 
 ## Overview
 
-ProfilesMe is a web application that allows users to create a single, comprehensive profile link to showcase all their online presence.
+ProfilesMe is a profile builder platform similar to `guns.lol` that allows users to create a single, comprehensive profile link to showcase all their online presence.
 
 ## Features
 
