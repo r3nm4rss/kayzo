@@ -1,7 +1,8 @@
 # ProfilesMe
 
 ### ProfilesMe is a profile builder platform similar to `guns.lol` that allows users to create a single, comprehensive profile link to showcase all their online presence.
-![Screenshot from 2024-11-21 20-07-05](https://github.com/user-attachments/assets/0392ef02-f729-4802-9064-478c02e999e5)
+![Screenshot from 2024-11-21 21-20-29](https://github.com/user-attachments/assets/f4e917d9-9767-45ea-8e7e-17437ef6804e)
+
 
 [v.webm](https://github.com/user-attachments/assets/0dba224f-1209-42cb-9a2b-33208ebd6abd)
 
