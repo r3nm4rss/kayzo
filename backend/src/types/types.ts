@@ -1,3 +1,5 @@
+import { RowDataPacket } from "mysql2/promise";
+
 export interface User {
   id: number;
   username: string;
@@ -26,4 +28,23 @@ export interface Link {
 export interface JwtPayload {
   id: number;
   email: string;
+}
+
+
+
+export interface UserWithLinks extends RowDataPacket {
+  userId: number;
+  username: string;
+  name: string;
+  description: string;
+  profilePicture: Buffer | null;
+  backgroundMedia: Buffer | null;
+  backgroundType: 'image' | 'video' | null;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+  linkId: number | null;
+  linkTitle: string | null;
+  linkUrl: string | null;
+  totalVisit: number
 }

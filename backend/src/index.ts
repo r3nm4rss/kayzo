@@ -7,10 +7,10 @@ import userRoutes from './routes/userRoutes';
 import linkRoutes from "./routes/linkRoutes"
 import authRoutes from './routes/authRoutes';
 import './config/passport';
+import { mongoDB } from './config/database';
 
 const app = express();
 
-// Middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true
@@ -27,7 +27,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 
-// Serve uploaded files
+
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
@@ -35,12 +35,14 @@ app.use('/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/links', linkRoutes);
 
-// Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something broke!' });
 });
-
+app.get('/' , (req,res)=> {
+  res.json({status: 'ok'})
+})
 app.listen(3000, () => {
+  mongoDB()
   console.log(`Server is running `);
 });

@@ -15,15 +15,15 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 
   if (!token) {
     res.status(401).json({ message: 'No token provided' });
-    return; // Ensure no further code runs
+    return;
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as User; // Assert type
-    req.user = decoded; // Attach user to the request object
-    next(); // Pass control to the next middleware or route handler
+    req.user = decoded;
+    next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });
-    return; // Ensure no further code runs
+    return; 
   }
 };

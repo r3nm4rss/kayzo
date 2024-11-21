@@ -5,8 +5,6 @@ import { Link, User } from '../types/types';
 export const createLink = async (req: Request, res: Response) => {
   try {
     const { userId, title, url } = req.body;
-
-    // Get the highest order number for this user
     const [orderResult] = await pool.execute(
       'SELECT MAX(`order`) as maxOrder FROM links WHERE userId = ?',
       [userId]
@@ -54,12 +52,12 @@ export const updateLink = async (req: Request, res: Response, next: NextFunction
 
     if ((result as any).affectedRows === 0) {
       res.status(404).json({ message: 'Link not found or unauthorized' });
-      return; // Prevent further execution
+      return;
     }
 
     res.json({ message: 'Link updated successfully' });
   } catch (error) {
-    next(error); // Pass the error to the global error handler
+    next(error);
   }
 };
 
@@ -74,12 +72,12 @@ export const deleteLink = async (req: Request, res: Response, next: NextFunction
 
     if ((result as any).affectedRows === 0) {
       res.status(404).json({ message: 'Link not found or unauthorized' });
-      return; // Prevent further execution
+      return;
     }
 
     res.json({ message: 'Link deleted successfully' });
   } catch (error) {
-    next(error); // Pass the error to the global error handler
+    next(error);
   }
 };
 
@@ -88,7 +86,7 @@ export const reorderLinks = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const { linkIds } = req.body; // Array of link IDs in new order
 
-    // Start transaction
+    
     const connection = await pool.getConnection();
     await connection.beginTransaction();
 

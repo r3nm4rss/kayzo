@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import mysql from 'mysql2/promise';
 
 
@@ -9,3 +10,8 @@ export const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
 });
+
+
+export const mongoDB = () => {
+  mongoose.connect(process.env.MONGO , {dbName: 'Profile'}).then(() => {console.log('MonogDB connected')})
+}

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createUser, getUserByUsername, updateUser, deleteUser } from '../controllers/userController';
+import { createUser, getUserByUsername, updateUser, deleteUser, setUsername } from '../controllers/userController';
 import { upload } from '../middleware/uploadMiddleware';
 import { isAuthenticated } from '../middleware/auth';
 
@@ -15,5 +15,7 @@ router.put('/:username', isAuthenticated, upload.fields([
   { name: 'backgroundMedia', maxCount: 1 }
 ]), updateUser);
 router.delete('/:username', isAuthenticated, deleteUser);
+router.post('/username' , isAuthenticated , setUsername)
+// router.get('/username' , )
 
 export default router;
