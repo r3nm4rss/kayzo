@@ -1,114 +1,138 @@
 import { NextFunction, Request, Response } from 'express';
-import { pool } from '../config/database';
-import { Link, User } from '../types/types';
+import { Link } from '../model/link'; // Mongoose Link model
+import mongoose from 'mongoose';
+import { User } from '../model/profiles';
 
-export const createLink = async (req: Request, res: Response) => {
+export const createLink = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId, title, url } = req.body;
-    const [orderResult] = await pool.execute(
-      'SELECT MAX(`order`) as maxOrder FROM links WHERE userId = ?',
-      [userId]
-    );
-    const maxOrder = Array.isArray(orderResult) && orderResult[0] ?
-      (orderResult[0] as any).maxOrder || 0 : 0;
 
-    const [result] = await pool.execute(
-      'INSERT INTO links (userId, title, url, `order`) VALUES (?, ?, ?, ?)',
-      [userId, title, url, maxOrder + 1]
-    );
+    // Check if user exists
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+       res.status(404).json({ message: 'User not found' });
+       return
+    }
 
-    res.status(201).json({ message: 'Link created successfully', id: (result as any).insertId });
+    // Find the maximum order for the user's links
+    const maxOrderLink = await Link.findOne({ userId }).sort({ order: -1 });
+    const maxOrder = maxOrderLink ? maxOrderLink.order : 0;
+
+    // Create a new link
+    const newLink = new Link({
+      userId,
+      title,
+      url,
+      order: maxOrder + 1,
+    });
+
+    await newLink.save();
+    res.status(201).json({
+      message: 'Link created successfully',
+      link: newLink,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-export const getLinks = async (req: Request, res: Response) => {
+
+export const getLinks = async (req: Request, res: Response) : Promise<void> => {
   try {
     const { userId } = req.params;
 
-    const [links] = await pool.execute(
-      'SELECT * FROM links WHERE userId = ? ORDER BY `order` ASC',
-      [userId]
-    );
+    // Validate user ID
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+       res.status(404).json({ message: 'User not found' });
+       return
+    }
 
-    res.json(links);
+    const links = await Link.find({ userId }).sort({ order: 1 });
+    res.status(200).json(links);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-export const updateLink = async (req: Request, res: Response, next: NextFunction) => {
+
+export const updateLink = async (req: Request, res: Response) : Promise<void> => {
   try {
     const { id } = req.params;
     const { title, url } = req.body;
 
-    const [result] = await pool.execute(
-      'UPDATE links SET title = ?, url = ? WHERE id = ? AND userId = ?',
-      [title, url, id, (req.user as User).id]
+    const updatedLink = await Link.findByIdAndUpdate(
+      id,
+      { title, url, updatedAt: new Date() },
+      { new: true }
     );
 
-    if ((result as any).affectedRows === 0) {
-      res.status(404).json({ message: 'Link not found or unauthorized' });
-      return;
+    if (!updatedLink) {
+       res.status(404).json({ message: 'Link not found' });
+      return
     }
 
-    res.json({ message: 'Link updated successfully' });
+    res.status(200).json({
+      message: 'Link updated successfully',
+      link: updatedLink,
+    });
   } catch (error) {
-    next(error);
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-export const deleteLink = async (req: Request, res: Response, next: NextFunction) => {
+
+export const deleteLink = async (req: Request, res: Response) : Promise<void> => {
   try {
     const { id } = req.params;
+    // console.log(id)
+    const deletedLink = await Link.findByIdAndDelete(id);
 
-    const [result] = await pool.execute(
-      'DELETE FROM links WHERE id = ? AND userId = ?',
-      [id, (req.user as User).id]
-    );
-
-    if ((result as any).affectedRows === 0) {
-      res.status(404).json({ message: 'Link not found or unauthorized' });
-      return;
+    if (!deletedLink) {
+       res.status(404).json({ message: 'Link not found' });
+       return
     }
 
-    res.json({ message: 'Link deleted successfully' });
+    res.status(200).json({ message: 'Link deleted successfully' });
   } catch (error) {
-    next(error);
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-export const reorderLinks = async (req: Request, res: Response) => {
+
+export const reorderLinks = async (req: Request, res: Response) : Promise<void> => {
   try {
     const { userId } = req.params;
-    const { linkIds } = req.body; // Array of link IDs in new order
+    const { linkIds } = req.body;
 
-    
-    const connection = await pool.getConnection();
-    await connection.beginTransaction();
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-      // Update order for each link
-      for (let i = 0; i < linkIds.length; i++) {
-        await connection.execute(
-          'UPDATE links SET `order` = ? WHERE id = ? AND userId = ?',
-          [i + 1, linkIds[i], userId]
+      for (let index = 0; index < linkIds.length; index++) {
+        const linkId = linkIds[index];
+        await Link.findByIdAndUpdate(
+          linkId,
+          { order: index + 1 },
+          { session }
         );
       }
 
-      await connection.commit();
-      res.json({ message: 'Links reordered successfully' });
+      await session.commitTransaction();
+      session.endSession();
+
+      res.status(200).json({ message: 'Links reordered successfully' });
     } catch (error) {
-      await connection.rollback();
+      await session.abortTransaction();
+      session.endSession();
       throw error;
-    } finally {
-      connection.release();
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };

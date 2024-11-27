@@ -31,7 +31,6 @@ export const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const [usernameSet, setUsernameSet] = useState<boolean>(false);
-
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem('token');
@@ -46,11 +45,11 @@ export const Dashboard: React.FC = () => {
         const response = await fetch(AUTH, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        console.log('afterrrr')
+
         const userData = await response.json();
         setUser(userData);
         setUsernameSet(!!userData.username);
-        const userLinks = await apiService.getUserLinks(userData.id);
+        const userLinks = await apiService.getUserLinks(userData._id);
         setLinks(userLinks);
       } catch (error) {
         toast({
@@ -74,7 +73,7 @@ export const Dashboard: React.FC = () => {
     try {
     setIsLoading(true);
       const newLink = await apiService.createLink({
-        userId: user.id,
+        userId: user._id,
         ...linkData
       });
       setLinks([...links, newLink]);
@@ -117,6 +116,7 @@ export const Dashboard: React.FC = () => {
 
     }
 
+    window.location.href = '/dashboard'
   };
 
   const handleUpdateLink = async (id: number, linkData: LinkFormData) => {
@@ -271,9 +271,9 @@ export const Dashboard: React.FC = () => {
 
               <div className="flex items-center space-x-4">
               <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl">
-                  {user.profileImage ? (
+                  {user.profilePicture ? (
                            <img
-                                src={user.profileImage}
+                                src={user.profilePicture}
                                 alt={user.username?.[0]?.toUpperCase() || 'User'}
                                 className="h-full w-full rounded-full border-2 border-primary object-cover"
                                     />
@@ -283,7 +283,7 @@ export const Dashboard: React.FC = () => {
                  </div>
 
                 <div>
-                  <h3 className="font-medium">{user.username}</h3>
+                  <h3 className="text-2xl font-medium">{user.username}</h3>
                   {/* <Link to={`/${user.username}`}>
 
 
@@ -363,7 +363,7 @@ export const Dashboard: React.FC = () => {
         currentLink={existingLink}
         onSubmit={(linkData) => {
           if (existingLink) {
-            handleUpdateLink(existingLink.id, linkData);
+            handleUpdateLink(existingLink._id, linkData);
           } else {
             handleAddLink(linkData);
           }
@@ -397,10 +397,11 @@ export const Dashboard: React.FC = () => {
                       ref={provided.innerRef}
                       className="space-y-4"
                     >
+
                       {links.map((link, index) => (
                         <Draggable
                           key={link.id}
-                          draggableId={link.id.toString()}
+                          draggableId={link._id.toString()}
                           index={index}
                         >
                           {(provided) => (
@@ -444,7 +445,7 @@ export const Dashboard: React.FC = () => {
                                   </DialogContent>
                                      </Dialog>
                                   <DropdownMenuItem
-                                    onClick={() => handleDeleteLink(link.id)}
+                                    onClick={() => handleDeleteLink(link._id)}
                                   >
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Delete

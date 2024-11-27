@@ -8,7 +8,7 @@ interface liveLinkProps {
 const LiveLink = ({username}: liveLinkProps) => {
   return (
     <div>
-      <Link to={`/${username}`} target='_blank'><p className='text-blue-400'>{`profilesme.site/${username}`}</p></Link>
+      <Link to={`/${username}`} target='_blank'><p>Link: <label className='text-blue-400'>{`profilesme.site/${username}`}</label></p></Link>
 
     </div>
   )

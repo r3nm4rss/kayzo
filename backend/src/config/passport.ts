@@ -1,52 +1,48 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { pool } from './database';
-import { User } from '../types/types';
+import { User } from '../model/profiles'; // Import the Mongoose model
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID!,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    callbackURL: "/auth/google/callback"
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      const [rows] = await pool.execute(
-        'SELECT * FROM users WHERE googleId = ?',
-        [profile.id]
-      );
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      callbackURL: '/auth/google/callback',
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Check if user exists in MongoDB
+        const existingUser = await User.findOne({ googleId: profile.id });
 
-      if (Array.isArray(rows) && rows.length > 0) {
-        return done(null, rows[0] as User);
+        if (existingUser) {
+          return done(null, existingUser);
+        }
+
+        // If user does not exist, create a new user
+        const newUser = new User({
+          googleId: profile.id,
+          email: profile.emails![0].value,
+          name: profile.displayName,
+        });
+        console.log('1')
+        const savedUser = await newUser.save();
+        console.log(2)
+        return done(null, savedUser);
+      } catch (error) {
+        return done(error as Error);
       }
-
-      const [result] = await pool.execute(
-        `INSERT INTO users (googleId, email, name) VALUES (?, ?, ?)`,
-        [profile.id, profile.emails![0].value, profile.displayName]
-      );
-
-      const [newUser] = await pool.execute(
-        'SELECT * FROM users WHERE id = ?',
-        [(result as any).insertId]
-      );
-
-      return done(null, (Array.isArray(newUser) ? newUser[0] : null) as User);
-    } catch (error) {
-      return done(error as Error);
     }
-  }
-));
+  )
+);
 
 passport.serializeUser((user: any, done) => {
   done(null, user.id);
 });
 
-passport.deserializeUser(async (id: number, done) => {
+passport.deserializeUser(async (id: string, done) => {
   try {
-    const [rows] = await pool.execute(
-      'SELECT * FROM users WHERE id = ?',
-      [id]
-    );
-    done(null, Array.isArray(rows) ? rows[0] as User : null);
+    const user = await User.findById(id);
+    done(null, user || null);
   } catch (error) {
     done(error, null);
   }

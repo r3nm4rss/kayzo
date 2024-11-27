@@ -1,19 +1,27 @@
 import { LucideIcon } from "lucide-react";
 
 // types.ts
+
+// interface ProfilePicture {
+//   data: string,
+//   type: string
+// }
+
 export interface User {
+  _id: string,
   id: number;
   username: string;
   name: string;
   description: string,
   email: string;
-  profileImage?: string
+  profilePicture?: string
   backgroundImage?: string;
   bio?: string;
   totalVisit?: number;
 }
 
 export interface Link {
+  _id: number,
   id: number;
   userId?: number;
   title: string;
@@ -32,7 +40,7 @@ export interface ProfileSettings {
 export interface SocialPlatform {
   id: string;
   name: string;
-  icon: LucideIcon;
+  icon: LucideIcon | string;
   placeholder: string;
   baseUrl: string;
 }

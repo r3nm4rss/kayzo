@@ -1,18 +1,20 @@
 import { RowDataPacket } from "mysql2/promise";
 
 export interface User {
-  id: number;
+  id: string; // MongoDB uses _id as the identifier
   username: string;
   name: string;
   email: string;
-  profilePicture: string;
-  googleId: string;
-  description: string;
-  backgroundMedia: string;
-  backgroundType: 'image' | 'video';
+  profilePicture?: string;
+  googleId?: string;
+  description?: string;
+  backgroundMedia?: string;
+  backgroundType?: 'image' | 'video';
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
+  totalVisit: number;
 }
+
 
 
 export interface Link {

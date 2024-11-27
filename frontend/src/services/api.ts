@@ -28,7 +28,7 @@ export const apiService = {
     return response.json();
   },
 
-  async createLink(link: { userId: number; title: string; url: string }): Promise<LinkType> {
+  async createLink(link: { userId: number | string; title: string; url: string }): Promise<LinkType> {
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/links`, {
       method: 'POST',

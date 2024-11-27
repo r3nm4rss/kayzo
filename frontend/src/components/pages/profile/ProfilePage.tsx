@@ -97,7 +97,6 @@ const ProfilePage: React.FC = () => {
   );
 
   const { profilePicture, backgroundMedia, backgroundType, name, description, links } = profile;
-  {console.log(profile)}
 
   // Function to play or pause the video
   const togglePlayPause = () => {
@@ -150,7 +149,7 @@ const ProfilePage: React.FC = () => {
 
       <Card className="relative w-full max-w-md mx-4 bg-black/2 backdrop-blur-md border border-black/10 rounded-sm">
         <div className="p-8 flex flex-col items-center space-y-6">
-     
+
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full animate-pulse blur-xl opacity-50" />
             <img

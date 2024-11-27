@@ -13,5 +13,5 @@ export const pool = mysql.createPool({
 
 
 export const mongoDB = () => {
-  mongoose.connect(process.env.MONGO , {dbName: 'Profile'}).then(() => {console.log('MonogDB connected')})
+  mongoose.connect(process.env.MONGO , {dbName: 'link_platform'}).then(() => {console.log('MonogDB connected')})
 }

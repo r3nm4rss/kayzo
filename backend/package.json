@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsc --outDir build -w index.ts",
+    "migrate": "npx tsc && node --env-file=.env build/dbmigrate.js",
     "dev1": "npx tsc && node --watch --env-file=.env build/index.js",
     "db": "npx prisma migrate && npx prisma generate",
     "Dev": "npx tsc && node build/index.js",
@@ -16,6 +17,8 @@
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.2",
+    "mongoose-auto-increment": "^5.0.1",
+    "mongoose-plugin-autoinc": "^1.1.9",
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.11.4",

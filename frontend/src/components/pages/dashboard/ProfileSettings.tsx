@@ -122,7 +122,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
           </div>
 
           <div>
-  <Label>Background Media <span className='text-red-400'>{`image preferred -(Max 5MB only)`}</span></Label>
+  <Label>Background Media <span className='text-red-400'>{`image or video -(Max 5MB only)`}</span></Label>
   <Input
     type="file"
     className="bg-gray-700"

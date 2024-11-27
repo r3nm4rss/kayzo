@@ -24,6 +24,6 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });
-    return; 
+    return;
   }
 };
