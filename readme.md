@@ -1,4 +1,4 @@
-# ProfilesMe
+# Kayzo
 
 ### ProfilesMe is a profile builder platform similar to `guns.lol` that allows users to create a single, comprehensive profile link to showcase all their online presence.
 ![Screenshot from 2024-11-21 21-20-29](https://github.com/user-attachments/assets/f4e917d9-9767-45ea-8e7e-17437ef6804e)
